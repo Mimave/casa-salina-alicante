@@ -450,7 +450,7 @@ function App() {
             exit={{ opacity: 0, y: 18, scale: .97 }}
           >
             <div className="concierge-header">
-              <div className="concierge-avatar"><SalinaMark /></div>
+              <div className="concierge-avatar"><img src="/salina-host.jpg" alt="Retrato de Salina, anfitriona digital" /></div>
               <div><strong>Salina</strong><small>Anfitriona digital · En línea</small></div>
               <button onClick={resetConcierge} aria-label="Reiniciar conversación"><RotateCcw /></button>
             </div>

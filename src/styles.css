@@ -240,8 +240,8 @@ footer { background: #092421; color: white; padding: 50px 0 24px; }
 .concierge-launcher svg { width: 20px; }
 .concierge-panel { position: fixed; z-index: 88; right: 24px; bottom: 92px; width: min(410px, calc(100vw - 32px)); max-height: min(680px, calc(100vh - 125px)); display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1px solid rgba(255,255,255,.5); border-radius: 28px; background: var(--paper); box-shadow: 0 30px 90px rgba(4,27,24,.34); color: var(--ink); }
 .concierge-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 17px 18px; background: var(--forest); color: white; }
-.concierge-avatar { width: 48px; height: 48px; border: 1.5px solid rgba(232,201,163,.48); border-radius: 50%; display: grid; place-items: center; color: var(--sand); background: rgba(255,255,255,.06); }
-.concierge-avatar svg { width: 35px; height: 35px; }
+.concierge-avatar { width: 52px; height: 52px; flex: 0 0 52px; padding: 3px; border: 1.5px solid rgba(232,201,163,.72); border-radius: 50%; overflow: hidden; background: rgba(255,255,255,.12); box-shadow: 0 6px 18px rgba(5,28,25,.24); }
+.concierge-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: 50% 37%; }
 .concierge-header strong, .concierge-header small { display: block; }
 .concierge-header strong { font-family: 'Playfair Display', serif; font-size: 1.12rem; }
 .concierge-header small { margin-top: 3px; color: rgba(255,255,255,.62); font-size: .64rem; }
