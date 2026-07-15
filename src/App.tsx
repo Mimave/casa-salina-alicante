@@ -471,7 +471,11 @@ function App() {
             <div className="concierge-header">
               <div className="concierge-avatar"><img src="/salina-host.jpg" alt="Retrato de Salina, anfitriona digital" /></div>
               <div><strong>Salina</strong><small>Anfitriona digital · En línea</small></div>
-              <button onClick={resetConcierge} aria-label="Reiniciar conversación"><RotateCcw /></button>
+              {conciergeStep > 0 && (
+                <button onClick={resetConcierge} aria-label="Volver al inicio de la conversación" title="Volver al inicio">
+                  <RotateCcw />
+                </button>
+              )}
             </div>
             <div className="concierge-body" aria-live="polite">
               <div className="agent-message">
