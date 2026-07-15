@@ -13,7 +13,6 @@ import {
   Camera,
   Mail,
   MapPin,
-  MessageCircle,
   Menu,
   Minus,
   ParkingCircle,
@@ -441,8 +440,20 @@ function App() {
         aria-expanded={conciergeOpen}
         aria-controls="concierge-panel"
       >
-        {conciergeOpen ? <X /> : <MessageCircle />}
-        {!conciergeOpen && <span>¿Te ayudo a elegir?</span>}
+        {conciergeOpen ? (
+          <X />
+        ) : (
+          <>
+            <span className="launcher-avatar" aria-hidden="true">
+              <img src="/salina-host.jpg" alt="" />
+              <span className="launcher-status" />
+            </span>
+            <span className="launcher-copy">
+              <strong>Habla con Salina</strong>
+              <small>Anfitriona digital · En línea</small>
+            </span>
+          </>
+        )}
       </button>
 
       <AnimatePresence>
