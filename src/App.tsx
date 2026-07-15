@@ -139,9 +139,9 @@ type TravelIntent = typeof travelIntents[number][0]
 function SalinaMark({ className = '' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <path d="M12.5 38V22.5C12.5 14.9 17.6 9 24 9s11.5 5.9 11.5 13.5V38" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="24" cy="21" r="3.2" fill="currentColor" />
-      <path d="M17 29c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6M17 34c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12.5 38V22.5C12.5 14.9 17.6 9 24 9s11.5 5.9 11.5 13.5V38" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="24" cy="21" r="3.6" fill="currentColor" />
+      <path d="M17 29c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6M17 34c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
     </svg>
   )
 }
