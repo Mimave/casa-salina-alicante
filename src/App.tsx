@@ -215,6 +215,14 @@ function App() {
     : travelIntent === 'pareja'
       ? rooms[1]
       : rooms[0]
+  const conciergeTotal = nights * conciergeRoom.price
+
+  const formatStayDate = (value: string) => new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T12:00:00Z`))
 
   const resetConcierge = () => {
     setConciergeStep(0)
@@ -463,6 +471,7 @@ function App() {
               {travelIntent && <div className="guest-message"><p>{travelIntents.find(([value]) => value === travelIntent)?.[1]}</p></div>}
               {travelsWithPet !== null && <div className="guest-message"><p>{travelsWithPet ? 'Viajo con mi perro' : 'Esta vez, sin mascota'}</p></div>}
               {conciergeGuests !== null && <div className="guest-message"><p>{conciergeGuests} huésped{conciergeGuests > 1 ? 'es' : ''}</p></div>}
+              {conciergeStep >= 5 && <div className="guest-message"><p>{formatStayDate(checkIn)} — {formatStayDate(checkOut)}</p></div>}
 
               {conciergeStep === 0 && (
                 <div className="agent-message">
@@ -493,8 +502,37 @@ function App() {
                   <h3>{conciergeRoom.name}</h3>
                   <p>{conciergeRoom.description}</p>
                   <div className="concierge-price"><strong>Desde {conciergeRoom.price}€</strong><small>por noche · total estimado al elegir fechas</small></div>
-                  <button className="button button-full" onClick={prepareConciergeBooking}>Preparar mi estancia <ArrowRight /></button>
+                  <button className="button button-full" onClick={() => setConciergeStep(4)}>Elegir mis fechas <CalendarDays /></button>
                   <small className="concierge-honesty"><ShieldCheck /> No consulto disponibilidad real ni realizo cobros.</small>
+                </div>
+              )}
+
+              {conciergeStep === 4 && (
+                <div className="agent-message concierge-dates">
+                  <span>Salina</span>
+                  <p>¿Cuándo te gustaría venir? Calcularé una estimación para {conciergeRoom.name}.</p>
+                  <div className="concierge-date-grid">
+                    <label>Entrada<input type="date" min={today} value={checkIn} onChange={(event) => { setCheckIn(event.target.value); if (checkOut && checkOut <= event.target.value) setCheckOut('') }} /></label>
+                    <label>Salida<input type="date" min={checkIn || today} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} /></label>
+                  </div>
+                  {checkIn && checkOut && nights < 1 && <small className="concierge-error">La salida debe ser posterior a la entrada.</small>}
+                  <button className="button button-full" disabled={nights < 1} onClick={() => setConciergeStep(5)}>Ver resumen <ArrowRight /></button>
+                </div>
+              )}
+
+              {conciergeStep === 5 && (
+                <div className="agent-message recommendation concierge-summary">
+                  <span>Tu estancia, de un vistazo</span>
+                  <h3>{conciergeRoom.name}</h3>
+                  <dl>
+                    <div><dt>Fechas</dt><dd>{formatStayDate(checkIn)} — {formatStayDate(checkOut)}</dd></div>
+                    <div><dt>Estancia</dt><dd>{nights} noche{nights > 1 ? 's' : ''}</dd></div>
+                    <div><dt>Huéspedes</dt><dd>{conciergeGuests ?? 2}{travelsWithPet ? ' + perro' : ''}</dd></div>
+                    <div className="summary-total"><dt>Total estimado</dt><dd>{conciergeTotal}€</dd></div>
+                  </dl>
+                  <button className="button button-full" onClick={prepareConciergeBooking}>Preparar solicitud <ArrowRight /></button>
+                  <button className="concierge-back" onClick={() => setConciergeStep(4)}>Cambiar fechas</button>
+                  <small className="concierge-honesty"><ShieldCheck /> Importe orientativo. Confirmaremos disponibilidad antes de cualquier pago.</small>
                 </div>
               )}
             </div>
