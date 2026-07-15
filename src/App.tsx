@@ -11,7 +11,6 @@ import {
   Compass,
   Dog,
   Camera,
-  Leaf,
   Mail,
   MapPin,
   MessageCircle,
@@ -137,10 +136,20 @@ const travelIntents = [
 
 type TravelIntent = typeof travelIntents[number][0]
 
+function SalinaMark({ className = '' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M12.5 38V22.5C12.5 14.9 17.6 9 24 9s11.5 5.9 11.5 13.5V38" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="24" cy="21" r="3.2" fill="currentColor" />
+      <path d="M17 29c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6M17 34c3.2-2.1 6.5-2.1 9.7 0 2.1 1.4 4.3 1.5 6.3.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function Logo() {
   return (
     <a className="logo" href="#inicio" aria-label="Casa Salina, ir al inicio">
-      <span className="logo-mark"><Leaf size={18} strokeWidth={1.8} /></span>
+      <span className="logo-mark"><SalinaMark /></span>
       <span><strong>Casa Salina</strong><small>Alicante · Boutique Stay</small></span>
     </a>
   )
@@ -441,7 +450,7 @@ function App() {
             exit={{ opacity: 0, y: 18, scale: .97 }}
           >
             <div className="concierge-header">
-              <div className="concierge-avatar"><Leaf /></div>
+              <div className="concierge-avatar"><SalinaMark /></div>
               <div><strong>Salina</strong><small>Anfitriona digital · En línea</small></div>
               <button onClick={resetConcierge} aria-label="Reiniciar conversación"><RotateCcw /></button>
             </div>

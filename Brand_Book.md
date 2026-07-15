@@ -44,7 +44,7 @@ Ejemplos:
 Luz natural, arquitectura honesta, materiales táctiles, encuadres amplios y detalles humanos. Predominio de piedra, lino, madera, agua y vegetación. Evitar saturación fuerte y poses artificiales.
 
 ## 6. Logotipo
-Símbolo de hoja/salina dentro de un círculo. Wordmark “Casa Salina” acompañado por el descriptor “Alicante · Boutique Stay”. Debe funcionar en una tinta y conservar aire alrededor.
+Emblema de arco mediterráneo: una puerta abierta al refugio, un sol naciente y dos líneas de mar/salina. El símbolo circular transmite hospitalidad, origen alicantino y calma, sin recurrir a códigos turísticos literales. Wordmark “Casa Salina” acompañado por el descriptor “Alicante · Boutique Stay”. Debe funcionar en una tinta, conservar aire alrededor y mantener su legibilidad en favicon.
 
 ## 7. Experiencia digital
 - Diseño mobile first.
