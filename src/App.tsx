@@ -14,12 +14,14 @@ import {
   Leaf,
   Mail,
   MapPin,
+  MessageCircle,
   Menu,
   Minus,
   ParkingCircle,
   Phone,
   Plus,
   Quote,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Star,
@@ -126,6 +128,15 @@ const amenityItems = [
   [ShieldCheck, 'Reserva segura'],
 ] as const
 
+const travelIntents = [
+  ['pareja', 'Una escapada en pareja'],
+  ['descanso', 'Necesito descansar'],
+  ['alicante', 'Quiero descubrir Alicante'],
+  ['trabajo', 'Viajo por trabajo'],
+] as const
+
+type TravelIntent = typeof travelIntents[number][0]
+
 function Logo() {
   return (
     <a className="logo" href="#inicio" aria-label="Casa Salina, ir al inicio">
@@ -144,6 +155,11 @@ function App() {
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [toast, setToast] = useState(false)
+  const [conciergeOpen, setConciergeOpen] = useState(false)
+  const [conciergeStep, setConciergeStep] = useState(0)
+  const [travelIntent, setTravelIntent] = useState<TravelIntent | null>(null)
+  const [travelsWithPet, setTravelsWithPet] = useState<boolean | null>(null)
+  const [conciergeGuests, setConciergeGuests] = useState<number | null>(null)
   const today = new Date().toISOString().split('T')[0]
 
   const selectedRoom = rooms.find((item) => item.name === room) ?? rooms[0]
@@ -160,6 +176,7 @@ function App() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && menuOpen) setMenuOpen(false)
+      if (event.key === 'Escape' && conciergeOpen) setConciergeOpen(false)
       if (galleryIndex === null) return
       if (event.key === 'Escape') setGalleryIndex(null)
       if (event.key === 'ArrowRight') setGalleryIndex((galleryIndex + 1) % gallery.length)
@@ -167,7 +184,7 @@ function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [galleryIndex, menuOpen])
+  }, [conciergeOpen, galleryIndex, menuOpen])
 
   useEffect(() => {
     document.body.style.overflow = galleryIndex === null ? '' : 'hidden'
@@ -182,6 +199,26 @@ function App() {
 
   const scrollToBooking = () => {
     document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const conciergeRoom = travelsWithPet
+    ? rooms[2]
+    : travelIntent === 'pareja'
+      ? rooms[1]
+      : rooms[0]
+
+  const resetConcierge = () => {
+    setConciergeStep(0)
+    setTravelIntent(null)
+    setTravelsWithPet(null)
+    setConciergeGuests(null)
+  }
+
+  const prepareConciergeBooking = () => {
+    setRoom(conciergeRoom.name)
+    setGuests(conciergeGuests ?? 2)
+    setConciergeOpen(false)
+    scrollToBooking()
   }
 
   return (
@@ -379,6 +416,82 @@ function App() {
         </div>
         <div className="container footer-bottom"><span>© 2026 Casa Salina Alicante</span><div><a href="#legal">Aviso legal</a><a href="#privacidad">Privacidad</a><a href="#cookies">Cookies</a></div><span>Diseñado con intención.</span></div>
       </footer>
+
+      <button
+        className={`concierge-launcher ${conciergeOpen ? 'active' : ''}`}
+        onClick={() => setConciergeOpen(!conciergeOpen)}
+        aria-label={conciergeOpen ? 'Cerrar anfitrión digital' : 'Hablar con el anfitrión digital'}
+        aria-expanded={conciergeOpen}
+        aria-controls="concierge-panel"
+      >
+        {conciergeOpen ? <X /> : <MessageCircle />}
+        {!conciergeOpen && <span>¿Te ayudo a elegir?</span>}
+      </button>
+
+      <AnimatePresence>
+        {conciergeOpen && (
+          <motion.aside
+            className="concierge-panel"
+            id="concierge-panel"
+            role="dialog"
+            aria-modal="false"
+            aria-label="Anfitrión digital de Casa Salina"
+            initial={{ opacity: 0, y: 24, scale: .96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: .97 }}
+          >
+            <div className="concierge-header">
+              <div className="concierge-avatar"><Leaf /></div>
+              <div><strong>Salina</strong><small>Anfitriona digital · En línea</small></div>
+              <button onClick={resetConcierge} aria-label="Reiniciar conversación"><RotateCcw /></button>
+            </div>
+            <div className="concierge-body" aria-live="polite">
+              <div className="agent-message">
+                <span>Salina</span>
+                <p>Hola. Estoy aquí para ayudarte a encontrar tu forma de parar, sin comisiones y sin prisas.</p>
+              </div>
+
+              {travelIntent && <div className="guest-message"><p>{travelIntents.find(([value]) => value === travelIntent)?.[1]}</p></div>}
+              {travelsWithPet !== null && <div className="guest-message"><p>{travelsWithPet ? 'Viajo con mi perro' : 'Esta vez, sin mascota'}</p></div>}
+              {conciergeGuests !== null && <div className="guest-message"><p>{conciergeGuests} huésped{conciergeGuests > 1 ? 'es' : ''}</p></div>}
+
+              {conciergeStep === 0 && (
+                <div className="agent-message">
+                  <span>Salina</span><p>¿Qué clase de viaje tienes en mente?</p>
+                  <div className="concierge-options">
+                    {travelIntents.map(([value, label]) => <button key={value} onClick={() => { setTravelIntent(value); setConciergeStep(1) }}>{label}</button>)}
+                  </div>
+                </div>
+              )}
+
+              {conciergeStep === 1 && (
+                <div className="agent-message">
+                  <span>Salina</span><p>¿Te acompaña un perro pequeño o mediano?</p>
+                  <div className="concierge-options two"><button onClick={() => { setTravelsWithPet(true); setConciergeStep(2) }}><Dog /> Sí, viene conmigo</button><button onClick={() => { setTravelsWithPet(false); setConciergeStep(2) }}>Esta vez, no</button></div>
+                </div>
+              )}
+
+              {conciergeStep === 2 && (
+                <div className="agent-message">
+                  <span>Salina</span><p>¿Cuántas personas vais a alojaros?</p>
+                  <div className="concierge-options guest-pills">{[1, 2].map((value) => <button key={value} onClick={() => { setConciergeGuests(value); setConciergeStep(3) }}>{value}</button>)}</div>
+                </div>
+              )}
+
+              {conciergeStep === 3 && (
+                <div className="agent-message recommendation">
+                  <span>Mi recomendación</span>
+                  <h3>{conciergeRoom.name}</h3>
+                  <p>{conciergeRoom.description}</p>
+                  <div className="concierge-price"><strong>Desde {conciergeRoom.price}€</strong><small>por noche · total estimado al elegir fechas</small></div>
+                  <button className="button button-full" onClick={prepareConciergeBooking}>Preparar mi estancia <ArrowRight /></button>
+                  <small className="concierge-honesty"><ShieldCheck /> No consulto disponibilidad real ni realizo cobros.</small>
+                </div>
+              )}
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {galleryIndex !== null && (
