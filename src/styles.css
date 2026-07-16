@@ -279,6 +279,7 @@ footer { background: #092421; color: white; padding: 50px 0 24px; }
 .agent-message > span { display: block; margin-bottom: 7px; color: #9a7048; font-size: .59rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .agent-message p, .guest-message p { margin: 0; font-size: .8rem; line-height: 1.5; }
 .agent-message p { color: #53635d; }
+.concierge-scope { display: block; margin-top: 10px; color: var(--muted); font-size: .61rem; line-height: 1.45; }
 .guest-message { margin-left: auto; width: fit-content; max-width: 86%; padding: 11px 14px; border-radius: 16px 5px 16px 16px; background: var(--forest); }
 .guest-message p { color: white; }
 .concierge-options { margin-top: 13px; display: grid; gap: 8px; }

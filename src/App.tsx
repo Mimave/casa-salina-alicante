@@ -636,6 +636,7 @@ function App() {
               <div className="agent-message">
                 <span>Salina</span>
                 <p>{isEnglish ? 'Hello. I am here to help you find your own way to pause, without commission and without hurry.' : 'Hola. Estoy aquí para ayudarte a encontrar tu forma de parar, sin comisiones y sin prisas.'}</p>
+                <small className="concierge-scope">{isEnglish ? 'I can help with Casa Salina, its stays and services. For anything else, I will connect you with the team.' : 'Puedo ayudarte con Casa Salina, sus estancias y servicios. Para cualquier otro asunto, te pondré en contacto con el equipo.'}</small>
               </div>
 
               {travelIntent && <div className="guest-message"><p>{travelIntents.find(([value]) => value === travelIntent)?.[isEnglish ? 2 : 1]}</p></div>}
