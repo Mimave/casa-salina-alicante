@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
+  Accessibility,
+  Car,
   CalendarDays,
   Check,
   ChevronDown,
@@ -13,6 +15,7 @@ import {
   Camera,
   Mail,
   MapPin,
+  MessageCircle,
   Menu,
   Minus,
   ParkingCircle,
@@ -21,11 +24,13 @@ import {
   Quote,
   RotateCcw,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
   Star,
   Sun,
   Utensils,
   Waves,
+  WashingMachine,
   Wifi,
   X,
 } from 'lucide-react'
@@ -39,6 +44,9 @@ type Room = {
   image: string
   description: string
   features: string[]
+  maxGuests: number
+  petFriendly?: boolean
+  accessible?: boolean
 }
 
 type GalleryItem = {
@@ -57,6 +65,7 @@ const rooms: Room[] = [
     image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=88',
     description: 'Texturas naturales, balcón francés y luz de levante desde primera hora.',
     features: ['Cama king', 'Balcón', 'Ducha efecto lluvia'],
+    maxGuests: 2,
   },
   {
     name: 'Suite Arena',
@@ -67,6 +76,7 @@ const rooms: Room[] = [
     image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1400&q=88',
     description: 'Una suite serena con bañera exenta y rincón de lectura frente al patio.',
     features: ['Bañera', 'Patio privado', 'Honesty bar'],
+    maxGuests: 2,
   },
   {
     name: 'Suite Brisa',
@@ -77,6 +87,42 @@ const rooms: Room[] = [
     image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1400&q=88',
     description: 'Más espacio, terraza íntima y un kit de bienvenida para tu compañero de viaje.',
     features: ['Terraza', 'Pet kit', 'Zona lounge'],
+    maxGuests: 2,
+    petFriendly: true,
+  },
+  {
+    name: 'Suite Luz',
+    label: 'Accesibilidad serena',
+    price: 225,
+    size: '40 m²',
+    guests: '2 huéspedes',
+    image: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1400&q=88',
+    description: 'Acceso sin escalones, circulación amplia y ducha a ras de suelo con la misma calidez de la casa.',
+    features: ['Acceso sin escalones', 'Ducha adaptada', 'Zona de descanso'],
+    maxGuests: 2,
+    accessible: true,
+  },
+  {
+    name: 'Suite Duna',
+    label: 'Para viajar en familia',
+    price: 265,
+    size: '48 m²',
+    guests: 'Hasta 3 huéspedes',
+    image: 'https://images.unsplash.com/photo-1598928636135-d146006ff4be?auto=format&fit=crop&w=1400&q=88',
+    description: 'Dormitorio amplio y cama auxiliar preparada bajo petición para una estancia familiar tranquila.',
+    features: ['Cama king', 'Cama auxiliar', 'Rincón de desayuno'],
+    maxGuests: 3,
+  },
+  {
+    name: 'Suite Faro',
+    label: 'La más espaciosa',
+    price: 295,
+    size: '56 m²',
+    guests: 'Hasta 4 huéspedes',
+    image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1400&q=88',
+    description: 'Dos ambientes conectados para compartir Alicante sin renunciar al espacio ni a la calma.',
+    features: ['Dos ambientes', 'Sofá cama', 'Mesa para cuatro'],
+    maxGuests: 4,
   },
 ]
 
@@ -126,6 +172,15 @@ const amenityItems = [
   [ShieldCheck, 'Reserva segura'],
 ] as const
 
+const localServices = [
+  { icon: WashingMachine, title: 'Lavandería local', text: 'Recogida y entrega coordinadas con un comercio de proximidad.' },
+  { icon: Car, title: 'Movilidad', text: 'Traslados y alquiler de vehículo gestionados directamente con el proveedor.' },
+  { icon: ShoppingBag, title: 'Comercios cercanos', text: 'Mercados, farmacia y compras útiles seleccionadas para evitar desplazamientos.' },
+  { icon: Compass, title: 'Experiencias locales', text: 'Rutas, talleres y propuestas culturales vinculadas con la comunidad.' },
+  { icon: Accessibility, title: 'Estancia accesible', text: 'Orientación previa sobre accesos, movilidad y necesidades concretas de la estancia.' },
+  { icon: MessageCircle, title: 'Continuidad por WhatsApp', text: 'Salina prepara el contexto y permite solicitar el traspaso explícito a una persona.' },
+] as const
+
 const travelIntents = [
   ['pareja', 'Una escapada en pareja'],
   ['descanso', 'Necesito descansar'],
@@ -162,6 +217,10 @@ function App() {
   const [room, setRoom] = useState(rooms[0].name)
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
+  const [guestName, setGuestName] = useState('')
+  const [guestEmail, setGuestEmail] = useState('')
+  const [guestPhone, setGuestPhone] = useState('')
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [toast, setToast] = useState(false)
   const [conciergeOpen, setConciergeOpen] = useState(false)
   const [conciergeStep, setConciergeStep] = useState(0)
@@ -180,6 +239,10 @@ function App() {
   }, [checkIn, checkOut])
 
   const total = nights * selectedRoom.price
+
+  useEffect(() => {
+    if (guests > selectedRoom.maxGuests) setGuests(selectedRoom.maxGuests)
+  }, [guests, selectedRoom.maxGuests])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -209,11 +272,15 @@ function App() {
     document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  const conciergeRoom = travelsWithPet
+  const conciergeRoom = travelsWithPet && (conciergeGuests ?? 2) <= rooms[2].maxGuests
     ? rooms[2]
-    : travelIntent === 'pareja'
-      ? rooms[1]
-      : rooms[0]
+    : (conciergeGuests ?? 2) >= 4
+      ? rooms[5]
+      : (conciergeGuests ?? 2) === 3
+        ? rooms[4]
+        : travelIntent === 'pareja'
+          ? rooms[1]
+          : rooms[0]
   const conciergeTotal = nights * conciergeRoom.price
 
   const formatStayDate = (value: string) => new Intl.DateTimeFormat('es-ES', {
@@ -381,19 +448,41 @@ function App() {
             </div>
             <form className="booking-form" onSubmit={submitBooking}>
               <div className="form-kicker"><CalendarDays /> Consulta de disponibilidad</div>
-              <label>Suite<select value={room} onChange={(e) => setRoom(e.target.value)}>{rooms.map((item) => <option key={item.name}>{item.name}</option>)}</select></label>
+              <label>Suite<select value={room} onChange={(e) => setRoom(e.target.value)}>{rooms.map((item) => <option key={item.name} value={item.name}>{item.name} · máx. {item.maxGuests}</option>)}</select></label>
               <div className="form-row">
                 <label>Entrada<input type="date" min={today} value={checkIn} onChange={(e) => { setCheckIn(e.target.value); if (checkOut && checkOut <= e.target.value) setCheckOut('') }} required /></label>
                 <label>Salida<input type="date" min={checkIn || today} value={checkOut} onChange={(e) => setCheckOut(e.target.value)} required /></label>
               </div>
-              <label>Huéspedes<div className="guest-counter"><button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} aria-label="Reducir huéspedes" disabled={guests === 1}><Minus /></button><strong aria-live="polite">{guests}</strong><button type="button" onClick={() => setGuests(Math.min(4, guests + 1))} aria-label="Añadir huésped" disabled={guests === 4}><Plus /></button></div></label>
+              <label>Huéspedes<div className="guest-counter"><button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} aria-label="Reducir huéspedes" disabled={guests === 1}><Minus /></button><strong aria-live="polite">{guests}</strong><button type="button" onClick={() => setGuests(Math.min(selectedRoom.maxGuests, guests + 1))} aria-label="Añadir huésped" disabled={guests === selectedRoom.maxGuests}><Plus /></button></div><small className="capacity-note">Capacidad máxima de {selectedRoom.name}: {selectedRoom.maxGuests} huésped{selectedRoom.maxGuests > 1 ? 'es' : ''}.</small></label>
               <div className="estimate">
                 <div><small>{nights > 0 ? `${selectedRoom.price}€ × ${nights} noche${nights > 1 ? 's' : ''}` : 'Selecciona tus fechas'}</small><strong>{nights > 0 ? `${total}€` : '—'}</strong></div>
                 <span>{nights > 0 ? 'Total estimado' : 'Precio desde'}</span>
               </div>
-              <button className="button button-full" type="submit" disabled={nights < 1}>Solicitar estancia <ArrowRight /></button>
-              <small className="privacy"><ShieldCheck /> No se realizará ningún cobro en esta demo.</small>
+              <div className="request-details">
+                <span className="request-details-title">Tus datos para preparar la solicitud</span>
+                <div className="form-row">
+                  <label>Nombre<input type="text" autoComplete="name" value={guestName} onChange={(event) => setGuestName(event.target.value)} required /></label>
+                  <label>Correo<input type="email" autoComplete="email" value={guestEmail} onChange={(event) => setGuestEmail(event.target.value)} required /></label>
+                </div>
+                <label>Teléfono o WhatsApp<input type="tel" autoComplete="tel" value={guestPhone} onChange={(event) => setGuestPhone(event.target.value)} required /></label>
+                <label className="consent-check"><input type="checkbox" checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} required /><span>Acepto que estos datos se utilicen únicamente para gestionar esta solicitud de estancia.</span></label>
+              </div>
+              <button className="button button-full" type="submit" disabled={nights < 1 || !privacyAccepted}>Preparar solicitud <ArrowRight /></button>
+              <small className="privacy"><ShieldCheck /> Demo funcional: no se comprueba disponibilidad ni se realiza ningún cobro.</small>
             </form>
+          </div>
+        </section>
+
+        <section className="section local-services-section" id="servicios-locales">
+          <div className="container">
+            <div className="section-heading split-heading">
+              <div><span className="eyebrow">Red de proximidad</span><h2>Lo que necesitas, cerca.</h2></div>
+              <p>Salina está preparada para conectar cada alojamiento con servicios de su comunidad, manteniendo la contratación y el pago directamente entre huésped y proveedor.</p>
+            </div>
+            <div className="local-services-grid">
+              {localServices.map(({ icon: Icon, title, text }) => <article className="local-service-card" key={title}><Icon /><h3>{title}</h3><p>{text}</p><span>Capacidad demostrativa</span></article>)}
+            </div>
+            <div className="prototype-disclosure"><ShieldCheck /><p><strong>Prototipo configurable.</strong> Los servicios mostrados son ejemplos. En una implementación real se activan únicamente colaboradores verificados por el alojamiento; cada proveedor confirma disponibilidad, contrata y cobra directamente al huésped.</p></div>
           </div>
         </section>
 
@@ -507,7 +596,7 @@ function App() {
               {conciergeStep === 2 && (
                 <div className="agent-message">
                   <span>Salina</span><p>¿Cuántas personas vais a alojaros?</p>
-                  <div className="concierge-options guest-pills">{[1, 2].map((value) => <button key={value} onClick={() => { setConciergeGuests(value); setConciergeStep(3) }}>{value}</button>)}</div>
+                  <div className="concierge-options guest-pills">{[1, 2, 3, 4].map((value) => <button key={value} onClick={() => { setConciergeGuests(value); setConciergeStep(3) }}>{value}</button>)}</div>
                 </div>
               )}
 
