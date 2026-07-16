@@ -15,6 +15,7 @@ El objetivo es reducir dudas repetitivas, facilitar una estancia cómoda y lleva
 - Tiene experiencia en español e inglés.
 - Deja preparado el puente a contacto humano y a WhatsApp Business, sin fingir que esté conectado.
 - Mide visitas y páginas vistas de forma agregada con Vercel Analytics.
+- La orientación rápida se limita a cinco pasos. En el penúltimo muestra un aviso visible de cierre para no alargar la conversación innecesariamente.
 
 ## Límites actuales, dichos con honestidad
 
@@ -22,6 +23,14 @@ El objetivo es reducir dudas repetitivas, facilitar una estancia cómoda y lleva
 - No hay cobro, confirmación automática ni sincronización con un PMS o channel manager.
 - No se envían datos a WhatsApp, proveedores locales ni a un humano todavía.
 - Los servicios locales futuros no serán vendidos ni cobrados por Casa Salina: el cliente contratará directamente con cada proveedor.
+- El borrador se conserva localmente en el navegador del visitante mientras escribe; no sustituye una reserva real ni un respaldo de servidor.
+
+## Continuidad ante cortes
+
+- El formulario guarda cada cambio del borrador en el dispositivo del visitante para poder recuperarlo tras un corte de conexión o una recarga.
+- La aplicación instala una caché progresiva: después de una visita con conexión, puede volver a abrir la interfaz si la red falla.
+- No se guardan contraseñas ni accesos de administración en el navegador. Los accesos al PMS, correo, pagos, WhatsApp Business y despliegue deben residir en proveedores autorizados con MFA y copias de seguridad.
+- Para la versión comercial, el motor de reservas debe confirmar la solicitud en servidor, mantener historial y aplicar copias cifradas, retención y restauración documentadas. El almacenamiento local es una ayuda de continuidad, no el sistema de verdad.
 
 ## Alcance permitido de Salina
 

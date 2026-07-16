@@ -271,6 +271,8 @@ function App() {
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [draftReady, setDraftReady] = useState(false)
+  const [draftSaved, setDraftSaved] = useState(false)
   const [toast, setToast] = useState(false)
   const [conciergeOpen, setConciergeOpen] = useState(false)
   const [conciergeStep, setConciergeStep] = useState(0)
@@ -305,6 +307,37 @@ function App() {
     const savedLanguage = window.localStorage.getItem('casa-salina-language')
     if (savedLanguage === 'en' || savedLanguage === 'es') setLanguage(savedLanguage)
   }, [])
+
+  useEffect(() => {
+    try {
+      const savedDraft = window.localStorage.getItem('casa-salina-booking-draft-v1')
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft) as Partial<{ room: string; guests: number; checkIn: string; checkOut: string; guestName: string; guestEmail: string; guestPhone: string; privacyAccepted: boolean }>
+        if (typeof draft.room === 'string' && rooms.some((item) => item.name === draft.room)) setRoom(draft.room)
+        if (typeof draft.guests === 'number' && draft.guests >= 1 && draft.guests <= 4) setGuests(draft.guests)
+        if (typeof draft.checkIn === 'string') setCheckIn(draft.checkIn)
+        if (typeof draft.checkOut === 'string') setCheckOut(draft.checkOut)
+        if (typeof draft.guestName === 'string') setGuestName(draft.guestName)
+        if (typeof draft.guestEmail === 'string') setGuestEmail(draft.guestEmail)
+        if (typeof draft.guestPhone === 'string') setGuestPhone(draft.guestPhone)
+        if (typeof draft.privacyAccepted === 'boolean') setPrivacyAccepted(draft.privacyAccepted)
+      }
+    } catch {
+      // The page remains usable if a browser blocks or clears local storage.
+    } finally {
+      setDraftReady(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!draftReady) return
+    try {
+      window.localStorage.setItem('casa-salina-booking-draft-v1', JSON.stringify({ room, guests, checkIn, checkOut, guestName, guestEmail, guestPhone, privacyAccepted, savedAt: new Date().toISOString() }))
+      setDraftSaved(true)
+    } catch {
+      setDraftSaved(false)
+    }
+  }, [room, guests, checkIn, checkOut, guestName, guestEmail, guestPhone, privacyAccepted, draftReady])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -535,6 +568,7 @@ function App() {
               </div>
               <button className="button button-full" type="submit" disabled={nights < 1 || !privacyAccepted}>{isEnglish ? 'Prepare request' : 'Preparar solicitud'} <ArrowRight /></button>
               <small className="privacy"><ShieldCheck /> {isEnglish ? 'Functional demo: availability is not checked and no charge is made.' : 'Demo funcional: no se comprueba disponibilidad ni se realiza ningún cobro.'}</small>
+              <small className="draft-status"><ShieldCheck /> {draftSaved ? (isEnglish ? 'Your draft is saved on this device as you type. It contains no passwords.' : 'Tu borrador se guarda en este dispositivo mientras escribes. No contiene contraseñas.') : (isEnglish ? 'This browser cannot save a local draft.' : 'Este navegador no puede guardar el borrador local.')}</small>
             </form>
           </div>
         </section>
@@ -682,6 +716,13 @@ function App() {
                 <div className="agent-message concierge-dates">
                   <span>Salina</span>
                   <p>{isEnglish ? `When would you like to visit? I will calculate an estimate for ${conciergeRoom.name}.` : `¿Cuándo te gustaría venir? Calcularé una estimación para ${conciergeRoom.name}.`}</p>
+                  <div className="concierge-limit-notice" role="status">
+                    <ShieldCheck />
+                    <div>
+                      <strong>{isEnglish ? 'Last step of this quick guide' : 'Último paso de esta orientación rápida'}</strong>
+                      <p>{isEnglish ? 'After the summary, this guided conversation ends to keep it clear and focused. You can prepare your request or start again whenever you wish.' : 'Después del resumen, esta conversación guiada se cierra para mantenerla clara y concreta. Podrás preparar tu solicitud o empezar de nuevo cuando quieras.'}</p>
+                    </div>
+                  </div>
                   <div className="concierge-date-grid">
                     <label>{isEnglish ? 'Check-in' : 'Entrada'}<input type="date" min={today} value={checkIn} onChange={(event) => { setCheckIn(event.target.value); if (checkOut && checkOut <= event.target.value) setCheckOut('') }} /></label>
                     <label>{isEnglish ? 'Check-out' : 'Salida'}<input type="date" min={checkIn || today} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} /></label>
