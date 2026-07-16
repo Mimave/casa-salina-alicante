@@ -376,7 +376,13 @@ function App() {
         : travelIntent === 'pareja'
           ? rooms[1]
           : rooms[0]
-  const conciergeTotal = nights * conciergeRoom.price
+  // Salina can recommend a suite, but the reservation form remains the single
+  // source of truth for the suite, guests, dates and total shown to the guest.
+  useEffect(() => {
+    if (conciergeStep < 3 || conciergeGuests === null) return
+    setRoom(conciergeRoom.name)
+    setGuests(Math.min(conciergeGuests, conciergeRoom.maxGuests))
+  }, [conciergeGuests, conciergeRoom.maxGuests, conciergeRoom.name, conciergeStep])
 
   const formatStayDate = (value: string) => new Intl.DateTimeFormat(isEnglish ? 'en-GB' : 'es-ES', {
     day: 'numeric',
@@ -393,8 +399,6 @@ function App() {
   }
 
   const prepareConciergeBooking = () => {
-    setRoom(conciergeRoom.name)
-    setGuests(conciergeGuests ?? 2)
     setConciergeOpen(false)
     scrollToBooking()
   }
@@ -735,12 +739,12 @@ function App() {
               {conciergeStep === 5 && (
                 <div className="agent-message recommendation concierge-summary">
                   <span>{isEnglish ? 'Your stay, at a glance' : 'Tu estancia, de un vistazo'}</span>
-                  <h3>{conciergeRoom.name}</h3>
+                  <h3>{selectedRoom.name}</h3>
                   <dl>
                     <div><dt>{isEnglish ? 'Dates' : 'Fechas'}</dt><dd>{formatStayDate(checkIn)} — {formatStayDate(checkOut)}</dd></div>
                     <div><dt>{isEnglish ? 'Stay' : 'Estancia'}</dt><dd>{nights} {isEnglish ? `night${nights > 1 ? 's' : ''}` : `noche${nights > 1 ? 's' : ''}`}</dd></div>
-                    <div><dt>{isEnglish ? 'Guests' : 'Huéspedes'}</dt><dd>{conciergeGuests ?? 2}{travelsWithPet ? (isEnglish ? ' + dog' : ' + perro') : ''}</dd></div>
-                    <div className="summary-total"><dt>{isEnglish ? 'Estimated total' : 'Total estimado'}</dt><dd>{conciergeTotal}€</dd></div>
+                    <div><dt>{isEnglish ? 'Guests' : 'Huéspedes'}</dt><dd>{guests}{travelsWithPet ? (isEnglish ? ' + dog' : ' + perro') : ''}</dd></div>
+                    <div className="summary-total"><dt>{isEnglish ? 'Estimated total' : 'Total estimado'}</dt><dd>{total}€</dd></div>
                   </dl>
                   <button className="button button-full" onClick={prepareConciergeBooking}>{isEnglish ? 'Prepare request' : 'Preparar solicitud'} <ArrowRight /></button>
                   <button className="concierge-back" onClick={() => setConciergeStep(4)}>{isEnglish ? 'Change dates' : 'Cambiar fechas'}</button>
