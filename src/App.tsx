@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Analytics } from '@vercel/analytics/react'
 import {
   ArrowRight,
   Accessibility,
@@ -728,6 +729,7 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      <Analytics mode="production" />
     </div>
   )
 }
