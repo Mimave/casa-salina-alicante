@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Analytics } from '@vercel/analytics/react'
 import {
@@ -279,6 +279,7 @@ function App() {
   const [travelIntent, setTravelIntent] = useState<TravelIntent | null>(null)
   const [travelsWithPet, setTravelsWithPet] = useState<boolean | null>(null)
   const [conciergeGuests, setConciergeGuests] = useState<number | null>(null)
+  const appliedConciergeStep = useRef(0)
   const today = new Date().toISOString().split('T')[0]
   const isEnglish = language === 'en'
   const activeFaqs = isEnglish ? faqsEn : faqs
@@ -367,6 +368,14 @@ function App() {
     document.getElementById('reservar')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const chooseRoom = (roomName: string) => {
+    const nextRoom = rooms.find((item) => item.name === roomName)
+    if (!nextRoom) return
+    setRoom(nextRoom.name)
+    setGuests((currentGuests) => Math.min(currentGuests, nextRoom.maxGuests))
+    scrollToBooking()
+  }
+
   const conciergeRoom = travelsWithPet && (conciergeGuests ?? 2) <= rooms[2].maxGuests
     ? rooms[2]
     : (conciergeGuests ?? 2) >= 4
@@ -379,9 +388,10 @@ function App() {
   // Salina can recommend a suite, but the reservation form remains the single
   // source of truth for the suite, guests, dates and total shown to the guest.
   useEffect(() => {
-    if (conciergeStep < 3 || conciergeGuests === null) return
+    if (conciergeStep < 3 || conciergeGuests === null || appliedConciergeStep.current === conciergeStep) return
     setRoom(conciergeRoom.name)
     setGuests(Math.min(conciergeGuests, conciergeRoom.maxGuests))
+    appliedConciergeStep.current = conciergeStep
   }, [conciergeGuests, conciergeRoom.maxGuests, conciergeRoom.name, conciergeStep])
 
   const formatStayDate = (value: string) => new Intl.DateTimeFormat(isEnglish ? 'en-GB' : 'es-ES', {
@@ -392,6 +402,7 @@ function App() {
   }).format(new Date(`${value}T12:00:00Z`))
 
   const resetConcierge = () => {
+    appliedConciergeStep.current = 0
     setConciergeStep(0)
     setTravelIntent(null)
     setTravelsWithPet(null)
@@ -490,7 +501,7 @@ function App() {
                   <div className="room-image-wrap">
                     <img src={item.image} alt={item.name} loading="lazy" />
                     <span className="room-label">{isEnglish ? item.labelEn : item.label}</span>
-                    <button className="round-button" onClick={() => { setRoom(item.name); scrollToBooking() }} aria-label={`${isEnglish ? 'Book' : 'Reservar'} ${item.name}`}><ArrowRight /></button>
+                    <button className="round-button" onClick={() => chooseRoom(item.name)} aria-label={`${isEnglish ? 'Book' : 'Reservar'} ${item.name}`}><ArrowRight /></button>
                   </div>
                   <div className="room-body">
                     <div className="room-title-row"><div><h3>{item.name}</h3><span>{item.size} · {isEnglish ? item.guestsEn : item.guests}</span></div><div className="price"><small>{isEnglish ? 'from' : 'desde'}</small><strong>{item.price}€</strong><small>{isEnglish ? '/ night' : '/ noche'}</small></div></div>
