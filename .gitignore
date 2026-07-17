@@ -3,3 +3,6 @@ dist/
 .npm-cache/
 *.log
 *.tsbuildinfo
+
+.vercel
+.env*
